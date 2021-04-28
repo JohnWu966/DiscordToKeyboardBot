@@ -1,6 +1,7 @@
 import discord
 import json
 from pyKey import pressKey, releaseKey, press, sendSequence, showKeys
+from map import buttonDict
 
 client = discord.Client()
 
@@ -8,13 +9,12 @@ with open('config.json') as file:
     data = json.load(file)
 
 # options:
-# True requires that the full text of the message match with an option.
-# False only requires that only the first word of the message match with an option.
-fullText = False
-# True will require that the message match the key word's case sensitivity.
+
+# Setting this flag to True will require that the message match the key word's case sensitivity.
 caseSensitive = False
 
-
+# Length of time to keep the key pressed. Default time is 0.05
+pressTime = 0.05
 
 
 @client.event
@@ -25,56 +25,32 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    messageText = message.content.lower()
-    if messageText.startswith('down'):
-        press('DOWN', 0.01)
-        print("DOWN")
-        return
-    if messageText.startswith('up'):
-        press('UP', 0.01)
-        print("UP")
-        return
-    if messageText.startswith('left'):
-        press('LEFT', 0.01)
-        print("LEFT")
-        return
-    if messageText.startswith('right'):
-        press('RIGHT', 0.01)
-        print("RIGHT")
-        return
-    if messageText.startswith('a'):
-        press('Z', 0.01)
-        print("z")
-        return
-    if messageText.startswith('b'):
-        press('X', 0.01)
-        print("x")
-        return
-    if messageText.startswith('start'):
-        press('ENTER', 0.01)
-        print("Enter")
-        return
-    if messageText.startswith('select'):
-        press('BKSP', 0.01)
-        print("Backspace")
+    if not caseSensitive:
+        messageText = message.content.lower()
+
+    if messageText == 'status':
+        await message.channel.send("Online.")
         return
 
+    try:
+        key = buttonDict[messageText]
+        print("Key Press:" + key)
+        press(key, 0.05)
+        return
+    except:
+        print("Invalid Input:" + messageText)
 
-# #todo:
-# #implement using map
-# #   |   Alias  |     Key     |   Duration    |
-# # add prefix functionality
-# #   ie. !bot Alias
-# #add initial setup wizard thing
-# #   customizable keyboard setup
-# #   takes in discord token
-# #add flags for
-# #   lowercase
-# #   startswith vs exact matching
-# #   prefixs
-# # add readme disclaimer about 'sticky shift'
-# # sanitate json file of the discord token.
-#
-#
-
+#todo:
+# add prefix functionality
+#   ie. !bot Alias
+# add initial setup wizard thing
+#   customizable keyboard setup
+#   takes in discord token
+# add flags for
+#   lowercase
+#   prefixs
+# add readme disclaimer about 'sticky shift'
+# sanitate json file of the discord token.
+# add option for multicharacter presses.
+#   use a prefix like _ to tell the bot that its a multi charactered input
 client.run(data["token"])
