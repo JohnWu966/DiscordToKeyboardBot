@@ -11,5 +11,4 @@ buttonDict = {
     "r":        "S",
     "start":    "ENTER",
     "select":   "BKSP"
-
 }
