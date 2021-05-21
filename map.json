@@ -1,0 +1,12 @@
+{
+  "down":     "DOWN",
+  "up":       "UP",
+  "left":     "LEFT",
+  "right":    "RIGHT",
+  "a":        "z",
+  "b":        "x",
+  "l":        "A",
+  "r":        "S",
+  "start":    "ENTER",
+  "select":   "BKSP"
+}
