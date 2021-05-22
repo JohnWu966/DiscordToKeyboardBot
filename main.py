@@ -1,9 +1,9 @@
 import discord
 import json
 from pyKey import pressKey, releaseKey, press, sendSequence, showKeys
-from menu import startUp
+from menu import startUp, validKeyPresses
 client = discord.Client()
-
+import sys
 
 @client.event
 async def on_ready():
@@ -100,6 +100,17 @@ with open('map.json') as map_json:
     else:
         for dictKey in tempDict:
             buttonDict[dictKey.lower()] = tempDict[dictKey]
+    for dictKey in buttonDict:
+        if buttonDict[dictKey] not in validKeyPresses:
+            print("Error when reading the button mapping.")
+            print()
+            print("Error in: ")
+            print("Alias: " + dictKey)
+            print("Key: " + buttonDict[dictKey])
+            print(buttonDict[dictKey] + "is not a valid key.")
+            print("Please refer to validkeys.md for a list of valid keys.")
+            print("If you cannot resolve the issue, then please delete the problematic alias-key pair from map.json")
+            sys.exit(0)
 
 print("DEBUG:")
 print("BUTTON DICT")

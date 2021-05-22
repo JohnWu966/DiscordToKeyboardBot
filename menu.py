@@ -17,6 +17,22 @@ usePrefixes = data["usePrefixes"]
 # It will ignore the prefix and scan the message starting from after the prefix.
 prefix = data["prefix"]
 
+validKeyPresses = [
+    "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "-",
+    "~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+",
+    "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\",
+    "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "{", "|", "|",
+    "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'",
+    "A", "S", "D", "F", "G", "H", "J", "K", "L", ":", "\"",
+    "z", "x", "c", "v", "b", "n", "m", ",", ".", "/",
+    "Z", "X", "C", "V", "B", "N", "M", "<", ">", "?",
+    "UP", "DOWN", "LEFT", "RIGHT",
+    "NUM1", "NUM2", "NUM3", "NUM4", "NUM5", "NUM6", "NUM7", "NUM8", "NUM9", "NUM0", "NUM-", "NUM+",
+    "INS", "HOME", "PGUP", "DEL", "END", "PGDN", "PRTSC", "SCROLL_LOCK",
+    "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
+    "CTRL", "LSHIFT", "RSHIFT", "BSLASH", "BKSP", "ENTER", "TAB", "TILDE", "BACKTICK", "ALT", "SPACEBAR", "CAPSLOCK", "NUMLOCK",
+]
+
 
 def loadConfig():
     global data
