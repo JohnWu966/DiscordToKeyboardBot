@@ -1,6 +1,9 @@
 import json
 import sys
 
+# Turn on to see debug messages in console
+debugMode = True
+
 with open('config.json') as file:
     data = json.load(file)
 # The token for the Discord Bot
@@ -34,6 +37,7 @@ validKeyPresses = [
 ]
 
 
+# import global flags from config.json
 def loadConfig():
     global data
     global token
@@ -62,8 +66,8 @@ def saveConfig():
     }
     with open('config.json', 'w') as outfile:
         json.dump(config, outfile)
-    print("DEBUG:SAVING CONFIG")
-    print(config)
+    # print("DEBUG:SAVING CONFIG")
+    # print(config)
     print()
 
 
@@ -112,10 +116,12 @@ def setPrefixStuff():
         userInput = input().lower()
         if userInput == '1':
             if usePrefixes:
+                print()
                 print("You are no longer using prefixes.")
                 print("The bot will now interpret every message it sees as a potential call for a keyboard press")
                 usePrefixes = False
             else:
+                print()
                 print("You are now using prefixes.")
                 print("The current prefix is: " + prefix)
                 print()
@@ -125,8 +131,10 @@ def setPrefixStuff():
             print()
             input("Please press ENTER to continue")
         elif userInput == '2':
+            print()
             print("The current prefix is: " + prefix)
             if not usePrefixes:
+                print()
                 print("You are currently not using prefixes, but you can still change the prefix in case you would "
                       "like to use prefixes in the future.")
             loop2 = True
@@ -263,7 +271,7 @@ def setSkipMenu():
         print()
         print("Are you sure you want to turn off the startup menu?")
         print(
-            "If you turn this off, then running run.bat will immediately start up the bot, but you'll no longer be "
+            "If you turn this off, then using run.bat will immediately start up the bot, but you'll no longer be "
             "able to change any settings without manually editing the configuration file yourself.")
         print(
             "Type (y) to confirm that you would like to turn off the startup menu. Type (n) to go back to the main "

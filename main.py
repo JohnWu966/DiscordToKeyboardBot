@@ -1,55 +1,108 @@
 import discord
 import json
-from pyKey import pressKey, releaseKey, press, sendSequence, showKeys
+import sys
+from pyKey import press
 from menu import startUp, validKeyPresses
 client = discord.Client()
-import sys
+
+# Turn on to see debug messages in console
+debugMode = True
+
+
+# remove the prefix from a message
+def skimMessage(message):
+    return message[len(prefix)+1:len(message)].strip()
+
+
+def initDict():
+    # initialize keyMapping from map.json
+    temp_dict = json.load(open('map.json'))
+    keyboard_dict = {}
+    # if caseSensitive is turned on, create a dictionary matching the one in map.json
+    if caseSensitive:
+        keyboard_dict = temp_dict
+    # if caseSensitive is turned off, create a new dictionary that is identical to the one found in map.json,
+    # except all keys are lowercase
+    else:
+        for dictKey in temp_dict:
+            keyboard_dict[dictKey.lower()] = temp_dict[dictKey]
+    checkDict(keyboard_dict)
+    return keyboard_dict
+
+
+# given a key mapping dictionary, check to see if it only contains valid keyboard presses.
+# crash the program if there's an invalid keyboard press.
+def checkDict(keyboard_dict):
+    for dict_key in keyboard_dict:
+        if keyboard_dict[dict_key] not in validKeyPresses:
+            print("Error when reading the button mapping.")
+            print()
+            print("Error in: ")
+            print("Alias: " + dict_key)
+            print("Key: " + keyboard_dict[dict_key])
+            print(keyboard_dict[dict_key] + "is not a valid key.")
+            print("Please refer to validkeys.md for a list of valid keys.")
+            print("If you cannot resolve the issue, then please delete the problematic alias-key pair from map.json")
+            input("Press ENTER to continue")
+            sys.exit(0)
+
 
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print('Successfully logged in as {0.user}'.format(client))
+    print("You can turn off the bot by pressing Ctrl + C")
 
 
+# runs everytime the bot sees anyone enter a message
 @client.event
 async def on_message(message):
+    # If this is the bot's message, return.
     if message.author == client.user:
         return
+
     messageText = message.content
 
+    # if the bot is not case sensitive, convert the message text into lowercase
     if not caseSensitive:
         messageText = messageText.lower()
 
+    # if the bot is using prefixes, then check if the message starts with the prefix.
+    # if it does not, then return
+    # if it does, then take out the prefix from the actual message content.
+    if usePrefixes:
+        if not messageText.startswith(prefix):
+            if debugMode:
+                print("DEBUG: Message: " + messageText + " does not start with prefix: " + prefix)
+            return
+        else:
+            messageText = skimMessage(messageText)
+
+    # test message to check if the bot is online
     if messageText == 'status':
         await message.channel.send("Online.")
         return
 
+    # search the dictionary for the alias.
+    # if a valid alias is found, press the key associated with the alias.
     try:
-        key = buttonDict[messageText]
-        print("Key Press:" + key)
+        key = keyMapping[messageText]
+        print("User " + message.author.display_name + " has pressed:" + key)
         press(key, 0.05)
         return
     except KeyError:
-        print("Invalid Input:" + messageText)
+        if debugMode:
+            print("DEBUG: Invalid Input:" + messageText)
 
 
 # todo:
-# add prefix functionality
-#   ie. !bot Alias
 # add initial setup wizard thing
 #   customizable keyboard setup
-#   takes in discord token
-# add readme disclaimer about 'sticky shift'
-# sanitate json file of the discord token.
+# rewrite readme
+    # add readme disclaimer about 'sticky shift'
 # add option for multicharacter presses.
 #   use a prefix like \ to tell the bot that its a multi charactered input
-# rewrite map in JSON
 # add mimic functionality
-
-# If usePrefixes is on, then given a message with a prefix,
-# skimMessage() will return the message, with the prefix cut out.
-
-# import map
-    # if not caseSensitive, convert all keys into lowercase after importing.
+# add a !bot help thing to have the bot print out the mapping
 
 # notes
 # every time you add a flag:
@@ -59,15 +112,11 @@ async def on_message(message):
 #       add global variables for it in both main.py and menu.py
 #       add those global variables to the json and the saveConfig and loadConfig
 
-# remove the prefix from a message
-def skimMessage(message):
-    return message[len(prefix)+1:len(message)].strip()
-
 
 if not json.load(open('config.json'))["skipMenu"]:
     startUp()
 
-# reload the configuration in case changes were made in the startup menu.
+# load the global flags from config.json
 with open('config.json') as file:
     data = json.load(file)
 
@@ -86,33 +135,17 @@ usePrefixes = data["usePrefixes"]
 # If usePrefixes is true, the bot will only look at messages that start with the specified prefix.
 # It will ignore the prefix and scan the message starting from after the prefix.
 prefix = data["prefix"]
+if not caseSensitive:
+    prefix = prefix.lower()
 
-# initialize buttonDict from map.json
-with open('map.json') as map_json:
-    tempDict = json.load(map_json)
-    buttonDict = {}
+# import the keyboard mapping from map.json
+keyMapping = initDict()
 
-    # if caseSensitive is turned on, create a dictionary matching the one in map.json
-    if caseSensitive:
-        buttonDict = tempDict
-    # if caseSensitive is turned off, create a new dictionary that is identical to the one found in map.json,
-    # except all keys are lowercase
-    else:
-        for dictKey in tempDict:
-            buttonDict[dictKey.lower()] = tempDict[dictKey]
-    for dictKey in buttonDict:
-        if buttonDict[dictKey] not in validKeyPresses:
-            print("Error when reading the button mapping.")
-            print()
-            print("Error in: ")
-            print("Alias: " + dictKey)
-            print("Key: " + buttonDict[dictKey])
-            print(buttonDict[dictKey] + "is not a valid key.")
-            print("Please refer to validkeys.md for a list of valid keys.")
-            print("If you cannot resolve the issue, then please delete the problematic alias-key pair from map.json")
-            sys.exit(0)
+# chunk of code for debugging stuff
+# testString = "!bot      hi friends"
+# newString = skimMessage(testString)
+# print(testString)
+# print(newString)
+# sys.exit(0)
 
-print("DEBUG:")
-print("BUTTON DICT")
-print(buttonDict)
 client.run(data["token"])
