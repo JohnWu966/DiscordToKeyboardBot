@@ -1,1 +1,9 @@
-{"token": "YOUR_TOKEN_HERE", "caseSensitive": false, "pressTime": 0.05, "skipMenu": false, "usePrefixes": false, "prefix": "!bot"}
+{
+    "token": "YOUR_TOKEN_HERE",
+    "caseSensitive": false,
+    "pressTime": 0.05,
+    "skipMenu": false,
+    "usePrefixes": true,
+    "prefix": "!bot",
+    "debugMode": true
+}

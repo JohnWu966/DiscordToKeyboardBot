@@ -2,11 +2,8 @@ import discord
 import json
 import sys
 from pyKey import press
-from menu import startUp, validKeyPresses
+from menu import startUp, validKeyPresses, printMapping, printBotSettings
 client = discord.Client()
-
-# Turn on to see debug messages in console
-debugMode = True
 
 
 # remove the prefix from a message
@@ -18,7 +15,7 @@ def initDict():
     # initialize keyMapping from map.json
     temp_dict = json.load(open('map.json'))
     keyboard_dict = {}
-    # if caseSensitive is turned on, create a dictionary matching the one in map.json
+    # if caseSensitive is turned on, just create a dictionary matching the one in map.json
     if caseSensitive:
         keyboard_dict = temp_dict
     # if caseSensitive is turned off, create a new dictionary that is identical to the one found in map.json,
@@ -26,6 +23,8 @@ def initDict():
     else:
         for dictKey in temp_dict:
             keyboard_dict[dictKey.lower()] = temp_dict[dictKey]
+
+    # check the resulting dictionary to make sure that all keyboard presses are valid.
     checkDict(keyboard_dict)
     return keyboard_dict
 
@@ -50,25 +49,32 @@ def checkDict(keyboard_dict):
 @client.event
 async def on_ready():
     print('Successfully logged in as {0.user}'.format(client))
+    print()
+    print("Here's a list of the bot's settings.")
+    printBotSettings()
+    print()
+    print("Here's a list of the key mappings.")
+    printMapping()
+    print()
     print("You can turn off the bot by pressing Ctrl + C")
 
 
-# runs everytime the bot sees anyone enter a message
+# runs every time the bot sees anyone enter a message
 @client.event
 async def on_message(message):
-    # If this is the bot's message, return.
+    # If this is the bot's message, skip the message.
     if message.author == client.user:
         return
 
     messageText = message.content
 
-    # if the bot is not case sensitive, convert the message text into lowercase
+    # if the bot is not in case sensitive mode, convert the message text into lowercase for processing
     if not caseSensitive:
         messageText = messageText.lower()
 
     # if the bot is using prefixes, then check if the message starts with the prefix.
-    # if it does not, then return
-    # if it does, then take out the prefix from the actual message content.
+        # if it does not, then skip the message.
+        # if it does, then extract the actual message content.
     if usePrefixes:
         if not messageText.startswith(prefix):
             if debugMode:
@@ -82,7 +88,7 @@ async def on_message(message):
         await message.channel.send("Online.")
         return
 
-    # search the dictionary for the alias.
+    # search the list of alias / key mapping for the alias.
     # if a valid alias is found, press the key associated with the alias.
     try:
         key = keyMapping[messageText]
@@ -91,37 +97,16 @@ async def on_message(message):
         return
     except KeyError:
         if debugMode:
-            print("DEBUG: Invalid Input:" + messageText)
+            print("DEBUG:" + message.author.display_name + " has entered an invalid input. " + messageText +
+                  " is not a valid keyboard press.")
 
-
-# todo:
-# add initial setup wizard thing
-#   customizable keyboard setup
-# rewrite readme
-    # add readme disclaimer about 'sticky shift'
-# add option for multicharacter presses.
-#   use a prefix like \ to tell the bot that its a multi charactered input
-# add mimic functionality
-# add a !bot help thing to have the bot print out the mapping
-
-# notes
-# every time you add a flag:
-#       add a menu for it in the list of bot Settings in the start menu
-#       add a line for it in "list of current settings"
-#       fix the else statement to account for the extra menu
-#       add global variables for it in both main.py and menu.py
-#       add those global variables to the json and the saveConfig and loadConfig
-
-
+# run the startup menu, unless the user has explicitly turned it off.
 if not json.load(open('config.json'))["skipMenu"]:
     startUp()
 
 # load the global flags from config.json
 with open('config.json') as file:
     data = json.load(file)
-
-# load configuration
-# _______________________________
 # The token for the Discord Bot
 token = data["token"]
 # Setting this flag to True will require that the message match the key word's case sensitivity.
@@ -137,15 +122,11 @@ usePrefixes = data["usePrefixes"]
 prefix = data["prefix"]
 if not caseSensitive:
     prefix = prefix.lower()
+# Turn on to see debug messages in console
+debugMode = data["debugMode"]
 
 # import the keyboard mapping from map.json
 keyMapping = initDict()
 
-# chunk of code for debugging stuff
-# testString = "!bot      hi friends"
-# newString = skimMessage(testString)
-# print(testString)
-# print(newString)
-# sys.exit(0)
-
+# start running the bot
 client.run(data["token"])
