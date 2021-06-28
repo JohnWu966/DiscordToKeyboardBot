@@ -3,7 +3,7 @@
     "caseSensitive": false,
     "pressTime": 0.05,
     "skipMenu": false,
-    "usePrefixes": true,
+    "usePrefixes": false,
     "prefix": "!bot",
-    "debugMode": true
+    "extraDetails": false
 }

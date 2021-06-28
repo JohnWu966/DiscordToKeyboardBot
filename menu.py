@@ -2,8 +2,8 @@ import json
 import sys
 import os
 
-# Turn on to see debug messages in console
-debugMode = True
+# Turn on to see extraDetails messages in console
+extraDetails = True
 
 with open('config.json') as file:
     data = json.load(file)
@@ -20,8 +20,8 @@ usePrefixes = data["usePrefixes"]
 # If usePrefixes is true, the bot will only look at messages that start with the specified prefix.
 # It will ignore the prefix and scan the message starting from after the prefix.
 prefix = data["prefix"]
-# Turn on to see debug messages in console
-debugMode = data["debugMode"]
+# Turn on to see Extra Details  in console
+extraDetails = data["extraDetails"]
 # import the key button binding from map.json
 key_dict = json.load(open('map.json'))
 
@@ -61,14 +61,14 @@ def loadConfig():
     global skipMenu
     global usePrefixes
     global prefix
-    global debugMode
+    global extraDetails
     token = data["token"]
     caseSensitive = data["caseSensitive"]
     pressTime = data["pressTime"]
     skipMenu = data["skipMenu"]
     usePrefixes = data["usePrefixes"]
     prefix = data["prefix"]
-    debugMode = data["debugMode"]
+    extraDetails = data["extraDetails"]
 
 
 # update config.json with the current configuration
@@ -80,14 +80,14 @@ def saveConfig():
         "skipMenu": skipMenu,
         "usePrefixes": usePrefixes,
         "prefix": prefix,
-        "debugMode": debugMode
+        "extraDetails": extraDetails
     }
     with open('config.json', 'w') as outfile:
         json.dump(config, outfile, indent=4)
-    if debugMode:
-        print()
-        print("DEBUG:SAVING CONFIG")
-        print(json.dumps(config, indent=1))
+    # if extraDetails:
+    #     print()
+    #     print("DEBUG:SAVING CONFIG")
+    #     print(json.dumps(config, indent=1))
     print()
 
 
@@ -103,10 +103,10 @@ def getAliasFromKey(key_press):
 def saveMapping():
     with open('map.json', 'w') as outfile:
         json.dump(key_dict, outfile, indent=4)
-    if debugMode:
-        print()
-        print("DEBUG:SAVING CONFIG")
-        print(json.dumps(key_dict, indent=1))
+    # if extraDetails:
+    #     print()
+    #     print("DEBUG:SAVING CONFIG")
+    #     print(json.dumps(key_dict, indent=1))
 
 
 def printMapping():
@@ -498,10 +498,10 @@ def printBotSettings():
         print("Prefix: " + prefix)
     else:
         print("Prefixes: Off")
-    if caseSensitive:
-        print("Debug Mode: On")
+    if extraDetails:
+        print("Extra Details: On")
     else:
-        print("Debug Mode: Off")
+        print("Extra Details:: Off")
     print()
     print()
 
@@ -647,8 +647,8 @@ def setPressTime():
     pause()
 
 
-def setDebugMode():
-    global debugMode
+def setextraDetails():
+    global extraDetails
     loop1 = True
     while loop1:
         clear()
@@ -656,27 +656,27 @@ def setDebugMode():
         print("Messages can fail to press a button in the following ways:")
         print("• Not using the prefix")
         print("• Trying to reference an alias that doesn't exist.")
-        print("Debug mode will also tell you about details when editing settings.")
+        print("Extra Details mode will also tell you about details when editing settings.")
         print()
-        print("It is recommended to keep the debug menu off to avoid cluttering your console.")
+        print("It is recommended to keep the Extra Details menu off to avoid cluttering your console.")
         print()
-        if debugMode:
-            print("The Bot is currently in debug mode")
+        if extraDetails:
+            print("The Bot is currently in Extra Details  mode")
         else:
-            print("The Bot is currently NOT in debug mode")
+            print("The Bot is currently NOT in Extra Details  mode")
         print()
-        print("Would you like to turn debug mode on or off")
+        print("Would you like to turn Extra Details  mode on or off")
         print("Please enter either 'on' or 'off'")
         userInput = input().lower()
         if userInput == 'on':
             print()
-            print("Debug Mode has been turned on")
-            debugMode = True
+            print("Extra Details Mode has been turned on")
+            extraDetails = True
             loop1 = False
         elif userInput == 'off':
             print()
-            print("Debug Mode has been turned off")
-            debugMode = False
+            print("Extra Details Mode has been turned off")
+            extraDetails = False
             loop1 = False
         else:
             print("Invalid Input")
@@ -692,7 +692,7 @@ def setBotToken():
         print("A Bot Token is a long randomized string of characters that is unique to your specific bot account.")
         print("By providing your bot account's token, you allow this program to control your bot account.")
         print("If you don't know how to find your bot token, you can google how to find it, or look at the "
-              "\"How to find a Discord Bot Token.pdf\" located in the docs folder.")
+              "\"How to setup a Discord Bot Account.pdf\" located in the docs folder.")
         print()
         print("The Current Bot Token is: " + token)
         print()
@@ -779,7 +779,35 @@ def startUp():
                 if len(data["token"]) <= 30:
                     print("Hi, it looks like this is your first time running this bot.")
                     print("Lets quickly go through some initial set up.")
-                    print("To be implemented later.")
+                    print("")
+                    print("First off, lets get your bot account's token.")
+                    print()
+                    print("Press ENTER to continue.")
+                    input()
+                    setBotToken()
+                    clear()
+                    print("Here is the current Keyboard Bindings")
+                    printMapping()
+                    print()
+                    print("If you would like to customize these button mappings, "
+                          "please restart the bot after finishing the initial setup and go into menu 2 in the Startup menu. "
+                          "You can restart the bot by pressing Ctrl + C or by simply closing the window.")
+                    print("Press ENTER to continue.")
+                    input()
+                    clear()
+
+                    print("Here is the current list of bot settings")
+                    printBotSettings()
+                    print()
+                    print("If you would like to customize these settings, "
+                          "please restart the bot after finishing the initial setup and go into menu 3 in the Startup menu."
+                          "You can restart the bot by pressing Ctrl + C or by simply closing the window.")
+                    print("Press ENTER to continue.")
+                    input()
+
+                    print("Startup Complete.")
+
+
                 loop1 = False
             elif userInput.startswith("2"):
                 loop2 = True
@@ -852,7 +880,7 @@ def startUp():
                     print("2. Prefix")
                     print("3. Case Sensitivity")
                     print("4. Press Time")
-                    print("5. Debug Mode")
+                    print("5. Extra Details Mode")
                     print("6. Change Bot Token")
                     print("7. Save and Return to Main Menu")
                     print()
@@ -868,7 +896,7 @@ def startUp():
                     elif userInput.startswith("4"):
                         setPressTime()
                     elif userInput.startswith("5"):
-                        setDebugMode()
+                        setextraDetails()
                     elif userInput.startswith("6"):
                         setBotToken()
                     elif userInput.startswith("7"):
@@ -885,8 +913,13 @@ def startUp():
             elif userInput.startswith("4"):
                 print()
                 print()
-                print("Description stuff")
-                print("To be implemented later")
+                print("This bot is used to press buttons on a host's keyboard based on input provided through text messages sent on Discord.")
+                print("By connecting this program with a discord bot account, the program will read every message "
+                      "sent in a given server, and press a button if it sees an appropriate message.")
+                print("For example, if the bot reads that a user has typed \"up\", the bot will press the up arrow on the host's keyboard.")
+                print("")
+                print("Press ENTER to exit.")
+                input()
             elif userInput.startswith("5"):
                 setSkipMenu()
                 if skipMenu:
