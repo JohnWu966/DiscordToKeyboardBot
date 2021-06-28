@@ -77,8 +77,8 @@ async def on_message(message):
         # if it does, then extract the actual message content.
     if usePrefixes:
         if not messageText.startswith(prefix):
-            if debugMode:
-                print("DEBUG: Message: " + messageText + " does not start with prefix: " + prefix)
+            if extraDetails:
+                print("Message: " + messageText + " does not start with prefix: " + prefix)
             return
         else:
             messageText = skimMessage(messageText)
@@ -86,6 +86,20 @@ async def on_message(message):
     # test message to check if the bot is online
     if messageText == 'status':
         await message.channel.send("Online.")
+        return
+
+    if messageText == 'help':
+        await message.channel.send("Here is a list of current key bindings.")
+        text = "```\n{} \t {}".format("Alias".ljust(20), "Keyboard Press")
+        text = text + "\n________________________________________________"
+        for alias in keyMapping:
+            text = text + "\n" + '{} \t {}'.format(alias.ljust(20),keyMapping[alias])
+        text = text + "```"
+        await message.channel.send(text)
+
+        if usePrefixes:
+            await message.channel.send("The bot is currently using a prefix to filter out messages. The current prefix is " + prefix)
+            await message.channel.send("Please begin your commands with " + prefix + " if you would like to make a key press.")
         return
 
     # search the list of alias / key mapping for the alias.
@@ -96,8 +110,8 @@ async def on_message(message):
         press(key, 0.05)
         return
     except KeyError:
-        if debugMode:
-            print("DEBUG:" + message.author.display_name + " has entered an invalid input. " + messageText +
+        if extraDetails:
+            print(message.author.display_name + " has entered an invalid input. " + messageText +
                   " is not a valid keyboard press.")
 
 # run the startup menu, unless the user has explicitly turned it off.
@@ -122,11 +136,17 @@ usePrefixes = data["usePrefixes"]
 prefix = data["prefix"]
 if not caseSensitive:
     prefix = prefix.lower()
-# Turn on to see debug messages in console
-debugMode = data["debugMode"]
+# Turn on to see extra details in console
+extraDetails = data["extraDetails"]
 
 # import the keyboard mapping from map.json
 keyMapping = initDict()
 
 # start running the bot
-client.run(data["token"])
+try:
+    client.run(data["token"])
+except Exception as e:
+    print("Error:")
+    print(e)
+    print("You've probably entered an invalid Bot Token")
+    print("Please re-enter the bot Token")
